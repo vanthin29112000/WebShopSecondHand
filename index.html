@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D-Store | Uy tín, chất lượng, giá rẻ</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css">
+    <link rel="shortcut icon" href="./image/d-store.png" type="image/x-icon">
+    <link rel="stylesheet" href="./css/general.css">
+    <link rel="stylesheet" href="./css/member.css">
+    <script src="https://kit.fontawesome.com/19793a3053.js" crossorigin="anonymous"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.3/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.3/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.3/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.4.3/firebase-analytics.js"></script>
+    <!-- hash script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+    <!-- <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-analytics.js"></script> -->
+
+    <script src="./script/DOM.js"></script>
+</head>
+<body>
+    <div class="layer-blur">
+        <div class="c-form-auth">
+            <div class="c-login-signup">
+                <span id="c-signup">Đăng ký</span>
+                <span id="c-login">Đăng nhập</span>
+            </div>
+            <form class="c-login">
+                <div class="c-from-login">
+                    <div class="c-login-username">
+                        <label for="login-username">
+                            <i class="fi-rr-portrait"></i>
+                        </label>
+                        <input type="text" id="login-username" placeholder="Tên đăng nhập" autocomplete="off" required />
+                    </div>
+                    <span class="warning" id="login-warning-username">(*)Tên đăng nhập không đúng!</span>
+                </div>
+                
+                <div class="c-from-login">
+                    <div class="c-login-password">
+                        <label for="login-password">
+                            <i class="fi-rr-lock"></i>
+                        </label>
+                        <input type="password" id="login-password" minlength="6" placeholder="Mật khẩu" autocomplete="off" required />
+                        <i id="login-toogle-pass" class="fi-rr-eye-crossed"></i>
+                    </div>
+                    <span class="warning" id="login-warning-password">(*)Tên đăng nhập hoặc mật khẩu không đúng!</span>
+                </div>
+
+                <input type="submit" value="Đăng nhập" class="c-login-web"/>
+                <span class="reset-password" onclick="open_reset_password()">Quên mật khẩu ?</span>
+            </form>
+            <!-- reset pass with username -->
+            <div class="reset-pass">
+                <form class="reset-pass-bg">
+                    <div class="button-close-reset" onclick="close_reset_password()">
+                        <i class="far fa-times-circle"></i>
+                    </div>
+                    <p class="title-reset-pass">Đặt lại mật khẩu</p>
+                    <input type="text" id = "email-reset" placeholder="Nhập Tên Đăng Nhập" required>
+                    <p class="warning" id="checked-username">Tên đăng nhập không tồn tại !!!</p>
+                    <input type="submit" onclick="reset_password()">
+                </form>
+            </div>
+
+            <form class="c-signup" hidden>
+                <div>
+                    <div class="c-signup-fullname field">    
+                        <i class="fas fa-signature title_label"></i>
+                        <input type="text" id="signup-fullname" placeholder="Họ và tên" autocomplete="off" />
+                    </div>
+                    <span class="warning" id="signup-warning-fullname">(*)Vui lòng nhập họ và tên!</span>
+                </div>
+                <div>    
+                    <div class="c-signup-username field">
+                        <i class="far fa-user-circle title_label"></i>
+                        <input type="text" id="signup-username" placeholder="Tên đăng nhập" autocomplete="off" required />
+                    </div>
+                    <span class="warning" id="signup-warning-username">(*)Tên đăng nhập không hợp lệ!</span>
+                </div>
+                <div>
+                    <div class="c-signup-birthdate field">
+                        <i class="fas fa-birthday-cake title_label"></i>
+                        <input type="date" id="signup-birthdate" autocomplete="off" />
+                        
+                    </div>
+                    <span class="warning" id="signup-warning-birthdate">(*)Vui lòng chọn ngày sinh hợp lệ!</span>
+                </div>
+                <div>
+                    <div class="c-signup-email field">
+                        <i class="fas fa-envelope title_label"></i>
+                        <input type="email" id="signup-email" placeholder="Địa chỉ Email" autocomplete="off" required />
+                        
+                    </div>
+                    <span class="warning" id="signup-warning-email">(*)Email không hợp lệ!</span>
+                </div>
+                <div>
+                    <div class="c-signup-gender field">
+                        <i class="fas fa-restroom title_label"></i>
+                        <div class="c-signup-gender gender-border">
+                            <label for="male">Nam:</label>
+                            <input type="radio" name="gender" id="male" value="male" />
+                            <label for="female">Nữ:</label>
+                            <input type="radio" name="gender" id="female" value="female" />
+                        </div>
+                        
+                    </div>
+                    <span class="warning" id="signup-warning-gender">(*)Chọn giới tính!</span>
+                </div>
+                <div>
+                    <div class="c-signup-password field">
+                        <i class="fas fa-lock title_label"></i>
+                        <input type="password" id="signup-password" placeholder="Mật khẩu" minlength="6" autocomplete="off" required />
+                        <p class="icon-hiden-show"><i id="signup-toogle-pass" class="fi-rr-eye-crossed"></i></p>
+                        
+                    </div>
+                    <span class="warning" id="signup-warning-password">(*)Mật khẩu không hợp lệ!</span>
+                </div>
+                <div>
+                    <div class="c-signup-tel field">
+                        <i class="fas fa-phone-square-alt title_label"></i>
+                        <input type="text" id="signup-tel" placeholder="Số điện thoại" autocomplete="off" onkeypress="return event.charCode >= 48 && event.charCode <= 57"/>
+                        
+                    </div>
+                    <span class="warning" id="signup-warning-tel">(*)Số điện thoại không hợp lệ!</span>
+                </div>
+                <div>
+                    <div class="c-signup-repassword field">
+                        <i class="fas fa-lock title_label"></i>
+                        <input type="password" id="signup-repassword" placeholder="Nhập lại mật khẩu" minlength="6" required />
+                        <p class="icon-hiden-show"><i id="signup-toogle-repass" class="fi-rr-eye-crossed"></i></p>
+                        
+                    </div>
+                    <span class="warning" id="signup-warning-repassword">(*)Mật khẩu không khớp!</span>
+                </div>
+                <div class="c-signup-grid">
+                    <div class="c-signup-address field">
+                        <i class="fas fa-map-marker-alt icon_map"></i>
+                        <input type="text" id="signup-address" placeholder="Đỉa chỉ giao hàng" autocomplete="off" />
+                        
+                    </div>
+                    <span class="warning" id="signup-warning-address">(*)Vui lòng nhập địa chỉ nhận hàng mặc định!</span>
+                </div>
+                
+                <input type="submit" value="Đăng ký" />
+            </form>
+        </div>
+    </div>
+
+    <header>
+        <img src="./image/d-store.png" alt="d-store.png" title="D-Store | Uy tín, chất lượng, giá rẻ" />
+        <div class="c-dashboard">
+            <!-- <i class="fas fa-align-justify"></i>
+            <span>Danh mục sản phẩm</span>
+            <i class="fi-rr-angle-small-down"></i>
+
+            <div class="c-dropdown">
+                <ul class="c-dropdown-row">
+                    <li class="c-dropdown-item">
+                        <img src="./image/dashboard/noithat.jpg" alt="noithat.jpg" />
+                        <span>Nội thất</span>
+                    </li>
+                    <li class="c-dropdown-item">
+                        <img src="./image/dashboard/pet.jpg" alt="thucung.jpg" />
+                        <span>Thú cưng</span>
+                    </li>
+                    <li class="c-dropdown-item">
+                        <img src="./image/dashboard/quanao.jpg" alt="quanao.jpg" />
+                        <span>Quần áo</span>
+                    </li>
+                    <li class="c-dropdown-item">
+                        <img src="./image/dashboard/vanphong.jpg" alt="vanphong.jpg" />
+                        <span>Văn phòng</span>
+                    </li>
+                    <li class="c-dropdown-item">
+                        <img src="./image/dashboard/mombaby.jpg" alt="mombaby.jpg" />
+                        <span>Mẹ và bé</span>
+                    </li>
+                </ul>
+                <ul class="c-dropdown-row">
+                    <li class="c-dropdown-item">
+                        <img src="./image/dashboard/caycanh.jpg" alt="caycanh.jpg" />
+                        <span>Cây cảnh</span>
+                    </li>
+                    <li class="c-dropdown-item">
+                        <img src="./image/dashboard/dienlanh.jpg" alt="dienlanh.jpg" />
+                        <span>Điện lạnh</span>
+                    </li>
+                    <li class="c-dropdown-item">
+                        <img src="./image/dashboard/dientu.jpg" alt="dientu.jpg" />
+                        <span>Điện tử</span>
+                    </li>
+                    <li class="c-dropdown-item">
+                        <img src="./image/dashboard/guitar.jpg" alt="guitar.jpg" />
+                        <span>Giải trí</span>
+                    </li>
+                    <li class="c-dropdown-item">
+                        <img src="./image/dashboard/job.jpg" alt="job.jpg" />
+                        <span>Việc làm</span>
+                    </li>
+                </ul>
+            </div> -->
+        </div>
+        <form class="search-product">
+            <input type="text" id="key-product" placeholder="Tìm kiếm sản phẩm tại đây..." autocomplete="off" />
+            <button type="submit" onclick="render_product_with_search()">
+                <i class="fi-rr-search" ></i>
+            </button>
+        </form>
+        <div class="c-user">
+            <i class="fi-rr-user"></i>
+            <span id="nameCurrentUser" >Tài khoản</span>
+            <div class="c-user-1"></div>
+        </div>
+        <div class="c-cart" onclick="change_form_cart(true)">
+            <i class="fi-rr-shopping-bag"></i>
+            <span>Giỏ hàng</span>
+            <span id="number-sp">0</span>
+        </div>
+    </header>
+
+    <div class="c-container">
+        <div class="c-slideshow">
+            <span id="preSlide">
+                <i class="fi-rr-angle-left"></i>
+            </span>
+            <div class="current-slide">
+                <img src="./image/hinh1.jpg" alt="" class="current-slide-img-1">
+                <img src="./image/hinh4.jpg" alt="" class="current-slide-img-1">
+                <img src="./image/hinh3.jpg" alt="" class="current-slide-img-2">
+            </div>
+            <span id="nextSlide"></span>
+        </div>
+        <div class="c-section">
+            <div class="c-sort">
+                <div class="c-sort-title">
+                    <i class="fas fa-filter"></i>
+                    <p>BỘ LỌC TÌM KIẾM</p>
+                </div>
+                <div class="c-sort-box-filter">
+                    <!-- test -->
+                    <script>render_filter()</script>
+
+                    <!--  -->
+                </div>
+            </div>
+            <div class="c-view">
+                <div class="c-view-sort">
+                    <div class="sort-product">
+                        <label>Xắp xếp sản phẩm :</label>
+                        <select name="sort" id="sort-item" onchange="buble_sort()">
+                            <option value="none">Không</option>
+                            <option value="new" >Mới nhất</option>
+                            <option value="price-increase">Theo giá : tăng dần</option>
+                            <option value="price-decrease" >Theo giá : giảm dần</option>
+                            <option value="discount-increase">Theo giảm giá : tăng dần</option>
+                            <option value="discount-decrease" >Theo giảm giá : giảm dần</option>
+                            <option value="amount-increase">Theo số lượng : tăng dần</option>
+                            <option value="amount-decrease" >Theo số lượng : giảm dần</option>
+                        </select>
+                    </div>
+                    <div class="pagnigation">
+                    </div>
+                </div>
+                <div class="c-view-product">
+                </div>
+            </div>
+        </div>
+        <footer>
+            <img src="./image/d-store.png" alt="dstore.png" />
+            <div class="footer-info">
+                <p>D-Store | Uy tín, chất lượng, giá rẻ</p>
+                <p><strong>Email:</strong>&emsp;dstore@gmail.com</p>
+                <p><strong>Số điện thoại:</strong>&emsp;0123456789</p>
+                <p><strong>Địa chỉ:</strong>&emsp;70 Tô Ký, phường Tân Chánh Hiệp, quận 12, TP.HCM</p>
+                <p></p>
+            </div>
+        </footer>
+    </div>
+
+    <div class="scroll-top">
+        <i class="fi-rr-angle-up"></i>
+    </div>
+
+    <div id="inf-product-c"></div>
+
+    <div class="list-cart-form-c">
+        
+        <div class="list-cart-f">
+            <div class="close-button" onclick="change_form_cart(false)">
+                <i class="far fa-times-circle" ></i>
+            </div>
+            <div class="list-cart-form">
+                <div class="list-cart-title">GIỎ HÀNG</div>
+                <div class="type-cart-title-background">
+                    <div class="type-cart-title">
+                        <div>Sản Phẩm</div>
+                        <div>Đơn Giá</div>
+                        <div>Số Lượng</div>
+                        <div>Thành Tiền</div>
+                        <div></div>
+                    </div>
+                </div>
+
+                <div class="list-product-incart"></div>
+
+                <div class="sum-product-incart">
+                    <div class="info-sum-product" >
+                        
+                    </div>
+                </div>
+            </div>
+        </div>    
+    </div>
+    <div id="pop-up"></div>
+    <div class="change-info-member">
+        <div class="c-change-info-back">
+            <div class="close-button" onclick="close_update_profile()">
+                <i class="far fa-times-circle" onclick=""></i>
+            </div>
+            <form class="c-change-info">
+                <div class="title-change-info">Thông tin tài khoản</div>
+                <div>
+                    <div class="c-signup-fullname field">    
+                        <i class="fas fa-signature title_label"></i>
+                        <input type="text" id="change-fullname" placeholder="Họ và tên" autocomplete="off" />
+                    </div>
+                    <span class="warning" id="change-warning-fullname">(*)Vui lòng nhập họ và tên!</span>
+                </div>
+                <div>    
+                    <div class="c-signup-username field">
+                        <i class="far fa-user-circle title_label"></i>
+                        <input type="text" id="change-username" placeholder="Tên đăng nhập" class="change-email" autocomplete="off" required readonly/>
+                    </div>
+                    <span class="warning" id="change-warning-username">(*)Tên đăng nhập không hợp lệ!</span>
+                </div>
+                <div>
+                    <div class="c-signup-birthdate field">
+                        <i class="fas fa-birthday-cake title_label"></i>
+                        <input type="date" id="change-birthdate" autocomplete="off" />
+                        
+                    </div>
+                    <span class="warning" id="change-warning-birthdate">(*)Vui lòng chọn ngày sinh hợp lệ!</span>
+                </div>
+                <div>
+                    <div class="c-signup-email field ">
+                        <i class="fas fa-envelope title_label"></i>
+                        <input type="email" id="change-email" placeholder="Địa chỉ Email" autocomplete="off" class="change-email" required readonly />
+                        
+                    </div>
+                    <span class="warning" id="change-warning-email">(*)Email không hợp lệ!</span>
+                </div>
+                <div>
+                    <div class="c-signup-gender field">
+                        <i class="fas fa-restroom title_label"></i>
+                        <div class="c-signup-gender gender-border">
+                            <label for="male">Nam:</label>
+                            <input type="radio" name="gender" id="change-male" value="male" />
+                            <label for="female">Nữ:</label>
+                            <input type="radio" name="gender" id="change-female" value="female" />
+                        </div>
+                        
+                    </div>
+                    <span class="warning" id="change-warning-gender">(*)Chọn giới tính!</span>
+                </div>
+                <div>
+                    <div class="c-signup-password field">
+                        <i class="fas fa-lock title_label"></i>
+                        <input type="password" id="change-password" placeholder="Mật khẩu mới" minlength="6" autocomplete="off"  />
+                        <p class="icon-hiden-show"><i id="change-toogle-pass" class="fi-rr-eye-crossed"></i></p>
+                    </div>
+                    <span class="warning" id="change-warning-password">(*)Mật khẩu không hợp lệ!</span>
+                </div>
+                <div>
+                    <div class="c-signup-tel field">
+                        <i class="fas fa-phone-square-alt title_label"></i>
+                        <input type="text" id="change-tel" placeholder="Số điện thoại" autocomplete="off" />
+                        
+                    </div>
+                    <span class="warning" id="change-warning-tel">(*)Số điện thoại không hợp lệ!</span>
+                </div>
+                <div>
+                    <div class="c-signup-repassword field">
+                        <i class="fas fa-lock title_label"></i>
+                        <input type="password" id="change-repassword" placeholder="Nhập lại mật khẩu" minlength="6"  />
+                        <p class="icon-hiden-show"><i id="change-toogle-repass" class="fi-rr-eye-crossed"></i></p>
+                        
+                    </div>
+                    <span class="warning" id="change-warning-repassword">(*)Mật khẩu không khớp!</span>
+                </div>
+                <div class="c-signup-grid">
+                    <div class="c-signup-address field">
+                        <i class="fas fa-map-marker-alt icon_map"></i>
+                        <input type="text" id="change-address" placeholder="Đỉa chỉ giao hàng" autocomplete="off" />
+                        
+                    </div>
+                    <span class="warning" id="change-warning-address">(*)Vui lòng nhập địa chỉ nhận hàng mặc định!</span>
+                </div>
+                
+                <input type="submit" value="Cập Nhật" class="button-update-info-member" onclick="update_info_member()">
+            </form>
+        </div>
+    </div>
+
+    <div class="login-again">
+        <div class="login-again-back">
+            <form class="c-login-again">
+                <div class="close-button" onclick="close_Login_Again()">
+                    <i class="far fa-times-circle" ></i>
+                </div>
+                <div class="title-login-again">Đăng nhập lại</div>
+                <div class="c-from-login">
+                    <div class="c-login-username">
+                        <label for="login-username">
+                            <i class="fi-rr-portrait"></i>
+                        </label>
+                        <input type="text" id="login-username-again" placeholder="Tên đăng nhập" autocomplete="off" required />
+                    </div>
+                    <span class="warning" id="login-warning-username-again">(*)Tên đăng nhập không đúng!</span>
+                </div>
+                
+                <div class="c-from-login">
+                    <div class="c-login-password">
+                        <label for="login-password">
+                            <i class="fi-rr-lock"></i>
+                        </label>
+                        <input type="password" id="login-password-again" minlength="6" placeholder="Mật khẩu" autocomplete="off" required />
+                        <i id="login-toogle-pass-again" class="fi-rr-eye-crossed"></i>
+                    </div>
+                    <span class="warning" id="login-warning-password-again">(*)Sai mật khẩu!</span>
+                </div>
+    
+                <input type="submit" value="Đăng nhập" class="c-login-web-again" onclick="login_Again()" />
+            </form>
+        </div>
+        
+    </div>
+    
+    <div class="plus">
+        <i class="fas fa-plus-circle plus-rotate"></i>
+        <div class="drop-down-icon-a">
+            <a href="http://localhost:3000/public/shop/index.html" target="_blank" rel="noopener noreferrer" title="Kênh người bán">
+                <img  src="./image/shop.png" alt="shop.png" />
+                <p class="title-href">TRANG SHOP</p>
+            </a>
+            <div class="posts-produce" onclick="open_tab_posts()">
+                <img src="./Casio/browser.png" alt="">
+                <p class="title-href">BÀI ĐĂNG</p>
+            </div>
+            <div class="order-button" onclick="open_tab_order()">
+                <img src="./Casio/shopping-cart.png" alt="">
+                <p class="title-href">ĐƠN HÀNG</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="order">
+        <div class="order-back">
+            <div class="list-order">
+                <div class="close-button" onclick="close_tab_order()">
+                    <i class="far fa-times-circle" ></i>
+                </div>
+                <div class="title-order">ĐƠN HÀNG</div>
+                <div class="list-order-status">
+                    <div class="title-order-show">
+                        <div class="title-order-accept" onclick="change_tab_order('title-order-accept','accept')">Đã xác nhận</div>
+                        <div class="title-order-none" id = "title-order-active" onclick="change_tab_order('title-order-none','none_accept')">Chưa xác nhận</div>
+                        <div class="title-order-complete" id = "" onclick="change_tab_order('title-order-complete','complete')">Hoàn Thành</div>
+                        <div class="title-order-cancel" onclick="change_tab_order('title-order-cancel','cancel')">Đã hủy</div>
+                    </div>
+                    <div class="show-order">    
+                        <div class="list-order-accept show-order-bg">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="confirm-accepted">
+        
+    </div>
+    <div class="posts-product-form">
+        <div class="posts-product-bg">
+            <div class="close-button" onclick="close_tab_posts()">
+                <i class="far fa-times-circle" ></i>
+            </div>
+
+            <div class="title-posts-product">
+                <p>Bài đăng</p>
+            </div>
+
+            <div class="list-posts-product">
+                <div class="title-list-posts">
+                    <div class="title-posts" id="title-list-posts-active">Đă đăng</div>
+                </div>
+                <i class="fas fa-plus-circle add-posts" onclick="open_tab_edit_posts(true)"></i>
+                <div class="show-posts">
+                    
+                    <div class="posts-info">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="edit-posts"></div>
+
+    <div class="form-checkout-bg" >
+            <div class="form-checkout">
+            <div class="close-button" onclick="close_checkout_cart()">
+                <i class="far fa-times-circle" ></i>
+            </div>
+            <div class="title-form-checkout">
+                Thanh Toán
+            </div>
+            <div class="list-checkout">
+                <div class="title-list-checkout">
+                    <div class="title-delivery-inf">
+                        <p class="number-checkout" id="chose-option-number">1</p>
+                        <p class="title-info-checkout" id="chose-option-title">Thông tin giao hàng</p>
+                    </div>
+                    <div class="title-delivery-inf">
+                        <p class="number-checkout">2</p>
+                        <p class="title-info-checkout">Thông tin đơn hàng</p>
+                    </div>
+                    <div class="title-delivery-inf">
+                        <p class="number-checkout">3</p>
+                        <p class="title-info-checkout">Thanh toán thành công</p>
+                    </div>
+                </div>
+                <div class="info-checkout-form-bg">
+                    
+                </div>
+                <div class="next-previou-checkout">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script >
+        var firebaseConfig = {
+            apiKey: "AIzaSyD-KMYYTXOpd_zWhYEw2op4I2fX7WALryA",
+            authDomain: "test-fb-bcea6.firebaseapp.com",
+            databaseURL: "https://test-fb-bcea6-default-rtdb.firebaseio.com",
+            projectId: "test-fb-bcea6",
+            storageBucket: "test-fb-bcea6.appspot.com",
+            messagingSenderId: "878951045612",
+            appId: "1:878951045612:web:3e2ca3bfefddd3259c88c9",
+            measurementId: "G-YBX2RD73CV"
+        };
+
+    //     var firebaseConfig = {
+    //     apiKey: "AIzaSyDcW7cHkVH6Uo-ZTO8hnr2xgQljE5vNzY8",
+    //     authDomain: "dstore-2505.firebaseapp.com",
+    //     projectId: "dstore-2505",
+    //     storageBucket: "dstore-2505.appspot.com",
+    //     messagingSenderId: "177445211998",
+    //     appId: "1:177445211998:web:b3c5d694129f6b840849cf",
+    //     measurementId: "G-XZY5LHEELT"
+    // };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+
+        const storage = firebase.storage();
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+    </script>
+    <script  src="./script/index.js"></script>
+    <script  src="./script/member.js"></script>
+    <script  src="./script/DOM.js"></script>
+    <script src="./fetch-api.js"></script>
+</body>
+</html>
